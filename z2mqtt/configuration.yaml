@@ -1,0 +1,47 @@
+homeassistant:
+  enabled: true
+frontend:
+  enabled: true
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://192.168.178.26
+  user: mqtt-user
+  password: "${MQTT_PASSWORD}"
+advanced:
+  network_key:
+    - 93
+    - 25
+    - 8
+    - 247
+    - 237
+    - 168
+    - 198
+    - 108
+    - 14
+    - 254
+    - 121
+    - 95
+    - 168
+    - 73
+    - 4
+    - 206
+  pan_id: 58124
+  ext_pan_id:
+    - 165
+    - 80
+    - 60
+    - 85
+    - 169
+    - 17
+    - 76
+    - 114
+version: 4
+devices:
+  '0xa4c1381d35a476d0':
+    friendly_name: koelkast
+  '0xa4c138c123e2e5b3':
+    friendly_name: home cinema
+  '0x0017880109070fe4':
+    friendly_name: eettafel
+  '0x00178801064cdfa4':
+    friendly_name: stalamp

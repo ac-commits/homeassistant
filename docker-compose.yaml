@@ -1,0 +1,59 @@
+services:
+  # HomeAssistant
+  homeassistant:
+    container_name: home-assistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      # Local path where your home assistant config will be stored
+      - /home/Alex/ha-config/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      # MariaDB is optional (only if you would like to use a different database for HA).
+      - mariadb
+    user: "${LOCAL_USER}:${LOCAL_USER}"
+    ports:
+      - "8321:8123"  # Map external port 8321 to internal port 8123
+  zigbee2mqtt:
+       container_name: zigbee2mqtt
+       image: koenkk/zigbee2mqtt
+       restart: unless-stopped
+       volumes:
+           - /home/Alex/ha-config/z2mqtt_data:/app/data
+           - /run/udev:/run/udev:ro
+       ports:
+           # Frontend port
+           - 8080:8080
+       environment:
+           - TZ=Europe/Amsterdam
+       devices:
+           # Make sure this matched your adapter location
+         - /dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240219142448-if00:/dev/ttyACM0
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    volumes:
+      - /home/Alex/ha-config/mosquitto:/mosquitto
+      - /home/Alex/ha-config/mosquitto/data:/mosquitto/data
+      - /home/Alex/ha-config/mosquitto/log:/mosquitto/log
+    ports:
+      - 1883:1883
+      - 9001:9001
+    user: "${LOCAL_USER}:${LOCAL_USER}"
+  # MariaDb
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: ha_db
+      MYSQL_USER: homeassistant
+      MYSQL_PASSWORD: "${HA_MYSQL_PASSWORD}"
+    user: "${LOCAL_USER}:${LOCAL_USER}"
+    volumes:
+      # Local path where the database will be stored.
+      - /home/Alex/ha-config/db:/var/lib/mysql
+    ports:
+      - "3306:3306"
